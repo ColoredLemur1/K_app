@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(python -m pip install djangorestframework-simplejwt==5.4.0 Pillow==11.2.1)",
+      "Bash(python -m venv venv)",
+      "Bash(venv/Scripts/pip install:*)"
+    ]
+  }
+}
