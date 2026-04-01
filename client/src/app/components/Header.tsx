@@ -31,6 +31,9 @@ export function Header() {
             <button onClick={() => scrollToSection('contact')} className="text-gray-700 hover:text-emerald-400 transition-colors">
               Contact
             </button>
+            <Link to="/service-area" className="text-gray-700 hover:text-emerald-400 transition-colors">
+              Service Area
+            </Link>
           </nav>
 
           <div className="flex items-center gap-4">

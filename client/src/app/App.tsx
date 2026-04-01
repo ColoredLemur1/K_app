@@ -10,6 +10,7 @@ import { Packages } from './components/Packages';
 import { About } from './components/About';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
+import { ServiceAreaPage } from './pages/ServiceAreaPage';
 
 function HomePage() {
   return (
@@ -45,6 +46,7 @@ export default function App() {
           <Route path="/"         element={<HomePage />} />
           <Route path="/login"    element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/service-area" element={<ServiceAreaPage />} />
 
           {/* Customer (login required) */}
           <Route path="/book"      element={<ProtectedRoute><ComingSoon label="Book a Session" /></ProtectedRoute>} />
