@@ -72,6 +72,10 @@ function PolygonEditor({
     });
 
     return () => {
+      if (layerRef.current) {
+        map.removeLayer(layerRef.current);
+        layerRef.current = null;
+      }
       map.pm.removeControls();
       map.off('pm:create');
     };
@@ -79,8 +83,7 @@ function PolygonEditor({
 
   const handleSave = () => {
     if (!layerRef.current) {
-      onSave([]);
-      return;
+      return; // Nothing to save — don't overwrite the existing zone
     }
     const latlngs = (layerRef.current.getLatLngs()[0] as L.LatLng[]);
     const coords: Coordinate[] = latlngs.map(ll => ({ lat: ll.lat, lng: ll.lng }));
