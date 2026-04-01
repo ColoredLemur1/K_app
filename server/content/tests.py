@@ -1,5 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
+from rest_framework.test import APIClient as DRFClient
 from .models import (
     PortfolioItem, AvailabilitySlot, BookingRequest,
     EditingRequest, EditingFile, Payment, Message, ServiceArea
@@ -110,3 +111,49 @@ class ServiceAreaTests(TestCase):
         reloaded = ServiceArea.objects.get(pk=area.pk)
         self.assertEqual(len(reloaded.polygon), 3)
         self.assertEqual(reloaded.polygon[0]["lat"], 51.7520)
+
+
+class ServiceAreaAPITests(TestCase):
+    def setUp(self):
+        self.client = DRFClient()
+        self.staff = User.objects.create_user(
+            username='kay@example.com', email='kay@example.com',
+            password='kaypass123', is_staff=True
+        )
+        self.customer = User.objects.create_user(
+            username='cust@example.com', email='cust@example.com',
+            password='custpass123'
+        )
+
+    def test_get_service_area_is_public(self):
+        res = self.client.get('/api/service-area/')
+        self.assertEqual(res.status_code, 200)
+        self.assertIn('polygon', res.data)
+
+    def test_patch_service_area_requires_staff(self):
+        self.client.force_authenticate(user=self.customer)
+        res = self.client.patch('/api/service-area/', {'polygon': []}, format='json')
+        self.assertEqual(res.status_code, 403)
+
+    def test_patch_service_area_as_staff_succeeds(self):
+        self.client.force_authenticate(user=self.staff)
+        polygon = [
+            {"lat": 51.7520, "lng": -1.2577},
+            {"lat": 51.7600, "lng": -1.2700},
+            {"lat": 51.7450, "lng": -1.2800},
+        ]
+        res = self.client.patch('/api/service-area/', {'polygon': polygon}, format='json')
+        self.assertEqual(res.status_code, 200)
+        self.assertEqual(len(res.data['polygon']), 3)
+
+    def test_patch_rejects_invalid_polygon_format(self):
+        self.client.force_authenticate(user=self.staff)
+        res = self.client.patch('/api/service-area/', {'polygon': "not a list"}, format='json')
+        self.assertEqual(res.status_code, 400)
+
+    def test_check_postcode_outside_empty_zone(self):
+        # Empty polygon → no home visits available
+        ServiceArea.get()  # ensure it exists with empty polygon
+        res = self.client.post('/api/service-area/check/', {'postcode': 'OX1 3DP'}, format='json')
+        # postcodes.io is external; accept 200 or 503
+        self.assertIn(res.status_code, [200, 503])
