@@ -1,52 +1,130 @@
-import { Award, Camera, Heart } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+const KAY_PHOTO = 'https://images.unsplash.com/photo-1618661148759-0d481c0c2116?w=800&q=80';
 
 export function About() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const nameRef    = useRef<HTMLHeadingElement>(null);
+  const lineRef    = useRef<HTMLDivElement>(null);
+  const textRef    = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!sectionRef.current) return;
+    const ctx = gsap.context(() => {
+      // Masked name reveal
+      if (nameRef.current) {
+        gsap.from(nameRef.current, {
+          y: 60, opacity: 0, duration: 1.0,
+          ease: 'power3.out',
+          scrollTrigger: { trigger: nameRef.current, start: 'top 82%' },
+        });
+      }
+      // Rule line draw
+      if (lineRef.current) {
+        gsap.from(lineRef.current, {
+          scaleX: 0, transformOrigin: 'left center', duration: 1.0,
+          ease: 'power3.inOut',
+          scrollTrigger: { trigger: lineRef.current, start: 'top 82%' },
+        });
+      }
+      // Text block fade
+      if (textRef.current) {
+        gsap.from(textRef.current, {
+          y: 30, opacity: 0, duration: 0.9,
+          ease: 'power3.out', delay: 0.2,
+          scrollTrigger: { trigger: textRef.current, start: 'top 82%' },
+        });
+      }
+      // Photo slide in from left
+      gsap.from('.about-photo', {
+        x: -40, opacity: 0, duration: 1.0,
+        ease: 'power3.out',
+        scrollTrigger: { trigger: sectionRef.current, start: 'top 78%' },
+      });
+    }, sectionRef);
+    return () => ctx.revert();
+  }, []);
+
   return (
-    <section id="about" className="py-20 bg-gradient-to-br from-emerald-50 to-teal-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-4xl text-emerald-900 mb-6">Who Am I</h2>
-            <p className="text-gray-700 mb-6">
-              Hi! I'm Sarah Anderson, a passionate photographer with over 10 years of experience 
-              capturing life's most precious moments. My journey started with a simple camera and 
-              a love for storytelling through images.
-            </p>
-            <p className="text-gray-700 mb-8">
-              I specialize in wedding, portrait, and event photography, always striving to create 
-              timeless images that you'll treasure for generations. Every photo tells a story, 
-              and I'm here to help tell yours.
-            </p>
+    <section
+      id="about"
+      ref={sectionRef}
+      style={{
+        background: '#fff', padding: '120px 0',
+        fontFamily: "'Helvetica Neue', Arial, sans-serif",
+      }}
+    >
+      <div style={{
+        maxWidth: 1200, margin: '0 auto', padding: '0 32px',
+        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80,
+        alignItems: 'center',
+      }}
+        className="sm:grid-cols-1"
+      >
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-              <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                <Camera className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-                <div className="text-2xl text-emerald-900 mb-1">500+</div>
-                <div className="text-gray-600 text-sm">Sessions</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                <Heart className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-                <div className="text-2xl text-emerald-900 mb-1">350+</div>
-                <div className="text-gray-600 text-sm">Happy Clients</div>
-              </div>
-              <div className="text-center p-4 bg-white rounded-lg shadow-sm">
-                <Award className="w-8 h-8 text-emerald-400 mx-auto mb-2" />
-                <div className="text-2xl text-emerald-900 mb-1">25+</div>
-                <div className="text-gray-600 text-sm">Awards</div>
-              </div>
-            </div>
+        {/* Left — photo */}
+        <div className="about-photo" style={{ position: 'relative' }}>
+          <div style={{
+            aspectRatio: '3/4', overflow: 'hidden',
+            background: '#f5f5f5',
+          }}>
+            <img
+              src={KAY_PHOTO}
+              alt="Kay Tubillla — photographer"
+              style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            />
           </div>
+        </div>
 
-          <div className="relative">
-            <div className="aspect-square rounded-2xl overflow-hidden shadow-xl">
-              <img
-                src="https://images.unsplash.com/photo-1618661148759-0d481c0c2116?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwaG90b2dyYXBoZXJ8ZW58MXx8fHwxNzY3NjIxOTgxfDA&ixlib=rb-4.1.0&q=80&w=1080"
-                alt="Professional photographer"
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="absolute -bottom-6 -right-6 w-48 h-48 bg-emerald-400 rounded-2xl -z-10"></div>
-            <div className="absolute -top-6 -left-6 w-32 h-32 bg-teal-300 rounded-2xl -z-10"></div>
+        {/* Right — text */}
+        <div>
+          <p style={{
+            fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase',
+            color: '#888', marginBottom: 24, fontWeight: 500,
+          }}>
+            About
+          </p>
+
+          <h2
+            ref={nameRef}
+            style={{
+              fontSize: 'clamp(36px, 4.5vw, 56px)', fontWeight: 300,
+              color: '#111', letterSpacing: '-0.02em', margin: '0 0 24px 0',
+              lineHeight: 1.1,
+            }}
+          >
+            Kay Tubillla
+          </h2>
+
+          <div
+            ref={lineRef}
+            style={{ width: '100%', maxWidth: 64, height: 1, background: '#111', marginBottom: 32 }}
+          />
+
+          <div ref={textRef}>
+            <p style={{
+              fontSize: 15, lineHeight: 1.85, color: '#555', marginBottom: 20, fontWeight: 400,
+            }}>
+              Based in Oxford, Kay has spent years developing a quiet, precise approach to photography
+              — one that puts subjects at ease and captures genuinely unguarded moments.
+            </p>
+            <p style={{
+              fontSize: 15, lineHeight: 1.85, color: '#555', marginBottom: 32, fontWeight: 400,
+            }}>
+              From intimate wedding ceremonies at the Bodleian to portrait sessions in Port Meadow,
+              every project is approached with the same attention: careful light, honest framing,
+              and an edit that serves the story rather than the trend.
+            </p>
+            <p style={{
+              fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase',
+              color: '#888', fontWeight: 500,
+            }}>
+              Oxford & Surrounding Area
+            </p>
           </div>
         </div>
       </div>
