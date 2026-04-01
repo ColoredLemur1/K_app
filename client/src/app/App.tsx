@@ -11,6 +11,7 @@ import { About } from './components/About';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
 import { ServiceAreaPage } from './pages/ServiceAreaPage';
+import { ServiceAreaEditor } from './components/admin/ServiceAreaEditor';
 
 function HomePage() {
   return (
@@ -54,8 +55,24 @@ export default function App() {
           <Route path="/dashboard" element={<ProtectedRoute><ComingSoon label="Dashboard" /></ProtectedRoute>} />
           <Route path="/messages"  element={<ProtectedRoute><ComingSoon label="Messages" /></ProtectedRoute>} />
 
-          {/* Admin (Kay only) */}
-          <Route path="/admin/*" element={<ProtectedRoute requireStaff><ComingSoon label="Admin" /></ProtectedRoute>} />
+          {/* Admin routes (Kay only) */}
+          <Route path="/admin" element={
+            <ProtectedRoute requireStaff>
+              <ComingSoon label="Admin Dashboard" />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/service-area" element={
+            <ProtectedRoute requireStaff>
+              <div style={{ padding: '80px 48px' }}>
+                <ServiceAreaEditor />
+              </div>
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/*" element={
+            <ProtectedRoute requireStaff>
+              <ComingSoon label="Admin" />
+            </ProtectedRoute>
+          } />
 
           {/* Fallback */}
           <Route path="*" element={<Navigate to="/" replace />} />
