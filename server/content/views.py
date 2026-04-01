@@ -6,7 +6,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
-from .models import ServiceArea
+from .models import ServiceArea, PortfolioItem
 
 
 def _point_in_polygon(lat, lng, polygon):
@@ -88,3 +88,27 @@ def service_area_check(request):
         'lng': lng,
         'is_within_zone': is_within,
     })
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def portfolio_list(request):
+    """
+    Returns all portfolio items ordered by `order` then `-created_at`.
+    Optional query param: ?category=wedding
+    """
+    qs = PortfolioItem.objects.all()
+    category = request.query_params.get('category')
+    if category:
+        qs = qs.filter(category=category)
+    items = []
+    for item in qs:
+        items.append({
+            'id': item.id,
+            'title': item.title,
+            'category': item.category,
+            'image': request.build_absolute_uri(item.image.url) if item.image else None,
+            'featured': item.featured,
+            'order': item.order,
+        })
+    return Response(items)
