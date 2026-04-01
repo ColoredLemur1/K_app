@@ -1,68 +1,204 @@
-const portfolioImages = [
-  {
-    id: 1,
-    category: 'Wedding',
-    image: 'https://images.unsplash.com/photo-1533091090875-1ff4acc497dd?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWRkaW5nJTIwcGhvdG9ncmFwaHl8ZW58MXx8fHwxNzY3NTI1MDQ0fDA&ixlib=rb-4.1.0&q=80&w=1080',
-  },
-  {
-    id: 2,
-    category: 'Portrait',
-    image: 'https://images.unsplash.com/photo-1544124094-8aea0374da93?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwb3J0cmFpdCUyMHBob3RvZ3JhcGh5fGVufDF8fHx8MTc2NzUzOTkxM3ww&ixlib=rb-4.1.0&q=80&w=1080',
-  },
-  {
-    id: 3,
-    category: 'Landscape',
-    image: 'https://images.unsplash.com/photo-1544954617-f5c6b0d16164?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxsYW5kc2NhcGUlMjBwaG90b2dyYXBoeXxlbnwxfHx8fDE3Njc1Mzg1OTd8MA&ixlib=rb-4.1.0&q=80&w=1080',
-  },
-  {
-    id: 4,
-    category: 'Event',
-    image: 'https://images.unsplash.com/photo-1614607653708-0777e6d003b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxldmVudCUyMHBob3RvZ3JhcGh5fGVufDF8fHx8MTc2NzYyMDUxNXww&ixlib=rb-4.1.0&q=80&w=1080',
-  },
-  {
-    id: 5,
-    category: 'Portrait',
-    image: 'https://images.unsplash.com/photo-1618661148759-0d481c0c2116?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwcm9mZXNzaW9uYWwlMjBwaG90b2dyYXBoZXJ8ZW58MXx8fHwxNzY3NjIxOTgxfDA&ixlib=rb-4.1.0&q=80&w=1080',
-  },
-  {
-    id: 6,
-    category: 'Product',
-    image: 'https://images.unsplash.com/photo-1431068799455-80bae0caf685?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjYW1lcmElMjBlcXVpcG1lbnR8ZW58MXx8fHwxNzY3NTQ4NDQxfDA&ixlib=rb-4.1.0&q=80&w=1080',
-  },
+import { useEffect, useRef, useState } from 'react';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
+
+interface PortfolioItem {
+  id: number;
+  title: string;
+  category: string;
+  image: string | null;
+  featured: boolean;
+  order: number;
+}
+
+const CATEGORIES = ['All', 'Wedding', 'Portrait', 'Event', 'Landscape', 'Product'] as const;
+
+// Fallback placeholder images shown when DB is empty
+const PLACEHOLDERS: PortfolioItem[] = [
+  { id: -1, title: 'Wedding', category: 'wedding', featured: false, order: 0,
+    image: 'https://images.unsplash.com/photo-1533091090875-1ff4acc497dd?w=800&q=80' },
+  { id: -2, title: 'Portrait', category: 'portrait', featured: false, order: 1,
+    image: 'https://images.unsplash.com/photo-1544124094-8aea0374da93?w=800&q=80' },
+  { id: -3, title: 'Landscape', category: 'landscape', featured: false, order: 2,
+    image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=800&q=80' },
+  { id: -4, title: 'Event', category: 'event', featured: false, order: 3,
+    image: 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80' },
+  { id: -5, title: 'Portrait', category: 'portrait', featured: false, order: 4,
+    image: 'https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=800&q=80' },
+  { id: -6, title: 'Product', category: 'product', featured: false, order: 5,
+    image: 'https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=800&q=80' },
 ];
 
+const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:8000/api';
+
 export function Portfolio() {
+  const [items, setItems] = useState<PortfolioItem[]>([]);
+  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [loading, setLoading] = useState(true);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const titleRef = useRef<HTMLDivElement>(null);
+
+  // Fetch portfolio from API, fall back to placeholders
+  useEffect(() => {
+    fetch(`${BASE_URL}/portfolio/`)
+      .then(r => r.ok ? r.json() : Promise.reject())
+      .then((data: PortfolioItem[]) => setItems(data.length > 0 ? data : PLACEHOLDERS))
+      .catch(() => setItems(PLACEHOLDERS))
+      .finally(() => setLoading(false));
+  }, []);
+
+  // Scroll-triggered title reveal
+  useEffect(() => {
+    if (!titleRef.current) return;
+    const ctx = gsap.context(() => {
+      gsap.from(titleRef.current!.children, {
+        y: 60, opacity: 0, stagger: 0.1, duration: 0.9,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: titleRef.current,
+          start: 'top 82%',
+        },
+      });
+    });
+    return () => ctx.revert();
+  }, []);
+
+  // Stagger grid items when they enter viewport (re-run on filter change)
+  useEffect(() => {
+    if (loading || !gridRef.current) return;
+    const cards = gridRef.current.querySelectorAll('.portfolio-card');
+    const ctx = gsap.context(() => {
+      gsap.from(cards, {
+        y: 40, opacity: 0, stagger: 0.07, duration: 0.7,
+        ease: 'power3.out',
+        scrollTrigger: {
+          trigger: gridRef.current,
+          start: 'top 85%',
+        },
+      });
+    });
+    return () => ctx.revert();
+  }, [loading, activeCategory]);
+
+  const filtered = activeCategory === 'All'
+    ? items
+    : items.filter(item => item.category.toLowerCase() === activeCategory.toLowerCase());
+
   return (
-    <section id="portfolio" className="py-20 bg-gradient-to-br from-emerald-50 to-teal-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-12">
-          <h2 className="text-4xl text-emerald-900 mb-4">Portfolio</h2>
-          <p className="text-gray-600">
-            A glimpse into our recent work
+    <section
+      id="portfolio"
+      ref={sectionRef}
+      style={{
+        background: '#fff', padding: '120px 0',
+        fontFamily: "'Helvetica Neue', Arial, sans-serif",
+      }}
+    >
+      <div style={{ maxWidth: 1200, margin: '0 auto', padding: '0 32px' }}>
+
+        {/* Section header */}
+        <div ref={titleRef} style={{ marginBottom: 56 }}>
+          <p style={{
+            fontSize: 10, letterSpacing: '0.25em', textTransform: 'uppercase',
+            color: '#888', marginBottom: 12, fontWeight: 500,
+          }}>
+            Portfolio
           </p>
+          <h2 style={{
+            fontSize: 'clamp(36px, 5vw, 64px)', fontWeight: 300,
+            color: '#111', letterSpacing: '-0.02em', margin: 0,
+          }}>
+            Selected Work
+          </h2>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {portfolioImages.map((item) => (
+        {/* Category filter */}
+        <div style={{ display: 'flex', gap: 4, flexWrap: 'wrap', marginBottom: 48 }}>
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              style={{
+                padding: '8px 20px',
+                background: activeCategory === cat ? '#111' : 'transparent',
+                color: activeCategory === cat ? '#fff' : '#888',
+                border: activeCategory === cat ? '1px solid #111' : '1px solid #ddd',
+                fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
+                textTransform: 'uppercase', cursor: 'pointer',
+                transition: 'all 0.2s',
+              }}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+
+        {/* Grid */}
+        <div
+          ref={gridRef}
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(3, 1fr)',
+            gap: 12,
+          }}
+          className="sm:grid-cols-2 grid-cols-1"
+        >
+          {filtered.map(item => (
             <div
               key={item.id}
-              className="group relative aspect-square overflow-hidden rounded-xl shadow-md hover:shadow-xl transition-all cursor-pointer"
+              className="portfolio-card"
+              style={{
+                position: 'relative', overflow: 'hidden',
+                aspectRatio: '1',
+                background: '#f5f5f5',
+                cursor: 'pointer',
+              }}
+              onMouseEnter={e => gsap.to(e.currentTarget.querySelector('img'), { scale: 0.96, duration: 0.4, ease: 'power2.out' })}
+              onMouseLeave={e => gsap.to(e.currentTarget.querySelector('img'), { scale: 1.04, duration: 0.4, ease: 'power2.out' })}
             >
-              <img
-                src={item.image}
-                alt={item.category}
-                className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-emerald-900/80 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end">
-                <div className="p-6 text-white">
-                  <span className="px-3 py-1 bg-emerald-400 rounded-full text-sm">
-                    {item.category}
-                  </span>
-                </div>
+              {item.image && (
+                <img
+                  src={item.image}
+                  alt={item.title}
+                  style={{
+                    width: '100%', height: '100%', objectFit: 'cover',
+                    display: 'block', transform: 'scale(1.04)',
+                    transition: 'none',
+                  }}
+                />
+              )}
+              {/* Category tag on hover */}
+              <div style={{
+                position: 'absolute', inset: 0,
+                background: 'rgba(0,0,0,0)',
+                display: 'flex', alignItems: 'flex-end',
+                padding: 16, transition: 'background 0.3s',
+              }}
+                onMouseEnter={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(0,0,0,0.25)'; }}
+                onMouseLeave={e => { (e.currentTarget as HTMLDivElement).style.background = 'rgba(0,0,0,0)'; }}
+              >
+                <span style={{
+                  fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase',
+                  color: '#fff', fontWeight: 500, opacity: 0,
+                  transition: 'opacity 0.3s',
+                }}
+                  className="portfolio-tag"
+                >
+                  {item.category}
+                </span>
               </div>
             </div>
           ))}
         </div>
+
+        {filtered.length === 0 && !loading && (
+          <p style={{ color: '#888', fontSize: 14, textAlign: 'center', padding: '48px 0' }}>
+            No images in this category yet.
+          </p>
+        )}
       </div>
     </section>
   );
