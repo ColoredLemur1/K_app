@@ -1,9 +1,18 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Camera } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export function Header() {
+  const { user, logout } = useAuth();
+  const navigate = useNavigate();
+
   const scrollToSection = (sectionId: string) => {
     document.getElementById(sectionId)?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
@@ -37,18 +46,29 @@ export function Header() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <Link
-              to="/register"
-              className="px-4 py-2 text-emerald-700 border border-emerald-400 rounded-lg hover:bg-emerald-50 transition-colors text-sm"
-            >
-              Register
-            </Link>
-            <Link
-              to="/login"
-              className="flex items-center gap-2 px-4 py-2 bg-emerald-400 text-white rounded-lg hover:bg-emerald-500 transition-colors text-sm"
-            >
-              Log In
-            </Link>
+            {user ? (
+              <button
+                onClick={handleLogout}
+                className="flex items-center gap-2 px-4 py-2 bg-emerald-400 text-white rounded-lg hover:bg-emerald-500 transition-colors text-sm"
+              >
+                Log Out
+              </button>
+            ) : (
+              <>
+                <Link
+                  to="/register"
+                  className="px-4 py-2 text-emerald-700 border border-emerald-400 rounded-lg hover:bg-emerald-50 transition-colors text-sm"
+                >
+                  Register
+                </Link>
+                <Link
+                  to="/login"
+                  className="flex items-center gap-2 px-4 py-2 bg-emerald-400 text-white rounded-lg hover:bg-emerald-500 transition-colors text-sm"
+                >
+                  Log In
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

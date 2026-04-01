@@ -36,7 +36,7 @@ SECRET_KEY = env('SECRET_KEY', default='django-insecure-^x8@@0@p@j$0a1_8p-9bb^g7
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = env('DEBUG', default=True)
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
 
 # Application definition
@@ -75,9 +75,6 @@ SIMPLE_JWT = {
 # --- Media files (portfolio images, editing uploads) ---
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
-
-# --- Service area (postcode prefixes Kay accepts for home visits) ---
-SERVICE_AREA_POSTCODES = ['OX1', 'OX2', 'OX3', 'OX4', 'OX5', 'OX14', 'OX18']
 
 # --- Consistent primary key type ---
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

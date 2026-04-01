@@ -3,7 +3,7 @@ import urllib.error
 import json
 
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 
 from .models import ServiceArea
@@ -45,7 +45,7 @@ def _geocode_postcode(postcode):
 
 
 @api_view(['GET', 'PATCH'])
-@permission_classes([AllowAny])
+@permission_classes([IsAuthenticatedOrReadOnly])
 def service_area_detail(request):
     area = ServiceArea.get()
 
