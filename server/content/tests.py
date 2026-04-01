@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import (
     PortfolioItem, AvailabilitySlot, BookingRequest,
-    EditingRequest, EditingFile, Payment, Message
+    EditingRequest, EditingFile, Payment, Message, ServiceArea
 )
 import datetime
 
@@ -86,3 +86,27 @@ class ModelSmokeTests(TestCase):
             body='Hi Kay, I was wondering about the session.',
         )
         self.assertFalse(msg.is_read)
+
+
+class ServiceAreaTests(TestCase):
+    def test_get_creates_default_empty_service_area(self):
+        area = ServiceArea.get()
+        self.assertIsNotNone(area)
+        self.assertEqual(area.polygon, [])
+
+    def test_service_area_singleton(self):
+        a1 = ServiceArea.get()
+        a2 = ServiceArea.get()
+        self.assertEqual(a1.pk, a2.pk)
+
+    def test_service_area_stores_polygon(self):
+        area = ServiceArea.get()
+        area.polygon = [
+            {"lat": 51.7520, "lng": -1.2577},
+            {"lat": 51.7600, "lng": -1.2700},
+            {"lat": 51.7450, "lng": -1.2800},
+        ]
+        area.save()
+        reloaded = ServiceArea.objects.get(pk=area.pk)
+        self.assertEqual(len(reloaded.polygon), 3)
+        self.assertEqual(reloaded.polygon[0]["lat"], 51.7520)

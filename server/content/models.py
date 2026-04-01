@@ -139,3 +139,20 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.thread_type}#{self.thread_id} from {self.sender.email}"
+
+
+class ServiceArea(models.Model):
+    """
+    Singleton model. Always access via ServiceArea.get().
+    Stores Kay's home-visit zone as a list of {"lat": float, "lng": float} dicts.
+    """
+    polygon = models.JSONField(default=list)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    @classmethod
+    def get(cls):
+        obj, _ = cls.objects.get_or_create(pk=1, defaults={'polygon': []})
+        return obj
+
+    def __str__(self):
+        return f"ServiceArea ({len(self.polygon)} points)"

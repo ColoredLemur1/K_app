@@ -1,7 +1,7 @@
 from django.contrib import admin
 from .models import (
     PortfolioItem, AvailabilitySlot, BookingRequest,
-    EditingRequest, EditingFile, Payment, Message
+    EditingRequest, EditingFile, Payment, Message, ServiceArea
 )
 
 admin.site.register(PortfolioItem)
@@ -11,3 +11,4 @@ admin.site.register(EditingRequest)
 admin.site.register(EditingFile)
 admin.site.register(Payment)
 admin.site.register(Message)
+admin.site.register(ServiceArea)
