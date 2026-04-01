@@ -1,44 +1,24 @@
-import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
-import { Products } from './components/Products';
 import { Portfolio } from './components/Portfolio';
 import { Packages } from './components/Packages';
 import { About } from './components/About';
 import { Contact } from './components/Contact';
 import { Footer } from './components/Footer';
-import { Login } from './components/Login';
-import { Basket } from './components/Basket';
+import { ServiceAreaPage } from './pages/ServiceAreaPage';
+import { ServiceAreaEditor } from './components/admin/ServiceAreaEditor';
 
-export default function App() {
-  const [currentPage, setCurrentPage] = useState<'home' | 'login' | 'basket'>('home');
-
-  const handleNavigate = (page: string) => {
-    setCurrentPage(page as 'home' | 'login' | 'basket');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
-  if (currentPage === 'login') {
-    return <Login onNavigate={handleNavigate} />;
-  }
-
-  if (currentPage === 'basket') {
-    return (
-      <>
-        <Header currentPage={currentPage} onNavigate={handleNavigate} />
-        <div className="pt-16">
-          <Basket onNavigate={handleNavigate} />
-        </div>
-      </>
-    );
-  }
-
+function HomePage() {
   return (
     <div className="min-h-screen">
-      <Header currentPage={currentPage} onNavigate={handleNavigate} />
-      <main className="pt-16">
+      <Header />
+      <main>
         <Hero />
-        <Products />
         <Portfolio />
         <Packages />
         <About />
@@ -46,5 +26,58 @@ export default function App() {
       </main>
       <Footer />
     </div>
+  );
+}
+
+// Placeholder pages — replaced in later plans
+function ComingSoon({ label }: { label: string }) {
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <p style={{ fontSize: 14, color: '#888' }}>{label} — coming soon</p>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          {/* Public */}
+          <Route path="/"         element={<HomePage />} />
+          <Route path="/login"    element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/service-area" element={<ServiceAreaPage />} />
+
+          {/* Customer (login required) */}
+          <Route path="/book"      element={<ProtectedRoute><ComingSoon label="Book a Session" /></ProtectedRoute>} />
+          <Route path="/editing"   element={<ProtectedRoute><ComingSoon label="Photo Editing" /></ProtectedRoute>} />
+          <Route path="/dashboard" element={<ProtectedRoute><ComingSoon label="Dashboard" /></ProtectedRoute>} />
+          <Route path="/messages"  element={<ProtectedRoute><ComingSoon label="Messages" /></ProtectedRoute>} />
+
+          {/* Admin routes (Kay only) */}
+          <Route path="/admin" element={
+            <ProtectedRoute requireStaff>
+              <ComingSoon label="Admin Dashboard" />
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/service-area" element={
+            <ProtectedRoute requireStaff>
+              <div style={{ padding: '80px 48px' }}>
+                <ServiceAreaEditor />
+              </div>
+            </ProtectedRoute>
+          } />
+          <Route path="/admin/*" element={
+            <ProtectedRoute requireStaff>
+              <ComingSoon label="Admin" />
+            </ProtectedRoute>
+          } />
+
+          {/* Fallback */}
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
