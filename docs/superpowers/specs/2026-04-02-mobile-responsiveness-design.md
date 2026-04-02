@@ -32,7 +32,7 @@
 - GSAP fade: `opacity` 0 → 1 on open, 1 → 0 on close, `duration: 0.25`
 - Body scroll locked while overlay is open (`document.body.style.overflow = 'hidden'`); restored on close
 
-**Implementation:** `useState<boolean>` (`menuOpen`) in `Header.tsx`. The overlay renders as a sibling `<div>` inside the `<header>` element. GSAP animates its opacity via a `useEffect` watching `menuOpen`.
+**Implementation:** `useState<boolean>` (`menuOpen`) in `Header.tsx`. `Header` returns a React Fragment containing both the `<header>` bar and the overlay `<div>` as siblings — the overlay must NOT be a child of `<header>` because `backdrop-filter` on the header creates a new CSS containing block that breaks `position: fixed` on children. GSAP animates the overlay's opacity via a `useEffect` watching `menuOpen`.
 
 ---
 
