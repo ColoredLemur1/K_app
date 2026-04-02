@@ -49,6 +49,19 @@ A new `AdminLayout.tsx` component wraps all admin pages. It renders:
 - `paddingTop: 40px` (below the top bar, which is `64px` tall)
 - Font: `'Helvetica Neue', Arial, sans-serif`
 
+**AdminLayout usage pattern:**
+Each admin page component renders `<AdminLayout>` as its root element (composition, not route-level wrapping). Example:
+```tsx
+export function AdminDashboard() {
+  return (
+    <AdminLayout activeTab="dashboard">
+      {/* page content */}
+    </AdminLayout>
+  );
+}
+```
+`AdminLayout` accepts an `activeTab` prop (`'dashboard' | 'bookings' | 'editing' | 'service-area'`) to highlight the correct tab.
+
 **App.tsx update:**
 Replace the three `<ComingSoon>` admin stubs with:
 ```tsx
