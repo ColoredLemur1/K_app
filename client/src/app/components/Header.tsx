@@ -57,16 +57,46 @@ export function Header() {
       }}>
         <div style={{
           maxWidth: 1200, margin: '0 auto',
-          padding: '0 32px',
+          padding: '0 20px',
           height: 64,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
         }}>
 
-          {/* Logo */}
-          <Link to="/" style={{ textDecoration: 'none' }}>
+          {/* Left cluster: mobile hamburger + desktop logo */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+            {/* Hamburger — mobile only (left side) */}
+            <button
+              onClick={() => setMenuOpen(true)}
+              className="md:hidden"
+              aria-label="Open menu"
+              style={{
+                background: 'none', border: 'none', padding: '6px 4px',
+                cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                gap: 5, justifyContent: 'center',
+              }}
+            >
+              <span style={{ display: 'block', width: 20, height: 1.5, background: '#111' }} />
+              <span style={{ display: 'block', width: 20, height: 1.5, background: '#111' }} />
+              <span style={{ display: 'block', width: 20, height: 1.5, background: '#111' }} />
+            </button>
+
+            {/* Logo (desktop) */}
+            <Link to="/" className="hidden md:inline" style={{ textDecoration: 'none' }}>
+              <span style={{
+                fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                fontSize: 13, fontWeight: 500, letterSpacing: '0.12em',
+                textTransform: 'uppercase', color: '#111',
+              }}>
+                Kay Tubillla
+              </span>
+            </Link>
+          </div>
+
+          {/* Logo (mobile centered) */}
+          <Link to="/" className="md:hidden" style={{ textDecoration: 'none' }}>
             <span style={{
               fontFamily: "'Helvetica Neue', Arial, sans-serif",
-              fontSize: 13, fontWeight: 500, letterSpacing: '0.12em',
+              fontSize: 13, fontWeight: 500, letterSpacing: '0.08em',
               textTransform: 'uppercase', color: '#111',
             }}>
               Kay Tubillla
@@ -166,21 +196,8 @@ export function Header() {
               </>
             )}
 
-            {/* Hamburger — mobile only */}
-            <button
-              onClick={() => setMenuOpen(true)}
-              className="md:hidden"
-              aria-label="Open menu"
-              style={{
-                background: 'none', border: 'none', padding: '4px 0 4px 8px',
-                cursor: 'pointer', display: 'flex', flexDirection: 'column',
-                gap: 5, justifyContent: 'center',
-              }}
-            >
-              <span style={{ display: 'block', width: 20, height: 1.5, background: '#111' }} />
-              <span style={{ display: 'block', width: 20, height: 1.5, background: '#111' }} />
-              <span style={{ display: 'block', width: 20, height: 1.5, background: '#111' }} />
-            </button>
+            {/* Spacer to keep centered logo visually centered on mobile */}
+            <div className="md:hidden" style={{ width: 28 }} />
           </div>
         </div>
       </header>
