@@ -5,7 +5,9 @@
 
   ## Running the code
 
-  Run `npm i` to install the dependencies.
+  **Frontend** (`client/`): run `npm i`, then `npm run dev`.
 
-  Run `npm run dev` to start the development server.
+  **Backend** (`server/`): create a virtualenv, `pip install -r requirements.txt`, copy `server/.env.example` to `server/.env`, then `python manage.py migrate` and `python manage.py runserver`.
+
+  **Local Postgres**: from the repo root, `docker compose up -d`, then set `DATABASE_URL` in `server/.env` as in `.env.example`. See [server/docs/LOCAL_DATABASE.md](server/docs/LOCAL_DATABASE.md).
   

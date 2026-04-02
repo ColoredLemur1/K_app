@@ -128,35 +128,13 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
-# Use Neon Postgres if credentials are provided, otherwise fall back to SQLite for local dev
-DB_NAME = env('DB_NAME', default=None)
-DB_USER = env('DB_USER', default=None)
-DB_PASSWORD = env('DB_PASSWORD', default=None)
-DB_HOST = env('DB_HOST', default=None)
-
-if all([DB_NAME, DB_USER, DB_PASSWORD, DB_HOST]):
-    # Neon Postgres configuration
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.postgresql',
-            'NAME': DB_NAME,
-            'USER': DB_USER,
-            'PASSWORD': DB_PASSWORD,
-            'HOST': DB_HOST,
-            'PORT': env('DB_PORT', default='5432'),
-            'OPTIONS': {
-                'sslmode': 'require',  # Neon requires SSL
-            },
-        }
-    }
-else:
-    # Fallback to SQLite if .env is not configured
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
-        }
-    }
+# Postgres: set DATABASE_URL (local Docker, Railway, etc.). For hosted Postgres that
+# requires SSL, add ?sslmode=require to the URL.
+# If DATABASE_URL is unset, SQLite is used (simple clone / CI without Docker).
+_default_sqlite = 'sqlite:///' + (BASE_DIR / 'db.sqlite3').as_posix()
+DATABASES = {
+    'default': env.db('DATABASE_URL', default=_default_sqlite),
+}
 
 
 # Password validation

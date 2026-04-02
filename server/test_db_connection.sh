@@ -1,23 +1,22 @@
 #!/bin/bash
-# Script to test Neon database connection
-# Run this in WSL: bash test_db_connection.sh
+# Test Postgres (or SQLite) connection from .env DATABASE_URL.
+# Run from Git Bash/WSL: bash test_db_connection.sh
 
 cd "$(dirname "$0")"
-source venv/bin/activate
+# shellcheck source=/dev/null
+source venv/Scripts/activate 2>/dev/null || source venv/bin/activate
 
 echo "Testing database connection..."
 python manage.py check --database default
 
 if [ $? -eq 0 ]; then
-    echo "✓ Database connection successful!"
+    echo "Database connection successful."
     echo ""
     echo "Running migrations..."
-    python manage.py makemigrations
     python manage.py migrate
     echo ""
-    echo "✓ Migrations completed!"
+    echo "Migrations completed."
 else
-    echo "✗ Database connection failed. Please check your .env file."
+    echo "Database connection failed. Check server/.env (DATABASE_URL)."
     exit 1
 fi
-

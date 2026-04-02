@@ -1,0 +1,19 @@
+services:
+  db:
+    build: ./docker/postgres
+    environment:
+      POSTGRES_USER: kayphoto
+      POSTGRES_PASSWORD: kayphoto
+      POSTGRES_DB: kayphoto
+    ports:
+      - "15432:5432"
+    volumes:
+      - kayphoto_pg_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U kayphoto -d kayphoto"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  kayphoto_pg_data:
