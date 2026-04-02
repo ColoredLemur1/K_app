@@ -58,20 +58,24 @@ export function About() {
         fontFamily: "'Helvetica Neue', Arial, sans-serif",
       }}
     >
-      <div style={{
-        maxWidth: 1200, margin: '0 auto', padding: '0 32px',
-        display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80,
-        alignItems: 'center',
-      }}
-        className="sm:grid-cols-1"
+      <div
+        className="about-grid"
+        style={{
+          maxWidth: 1200, margin: '0 auto', padding: '0 32px',
+          display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 80,
+          alignItems: 'center',
+        }}
       >
 
         {/* Left — photo */}
         <div className="about-photo" style={{ position: 'relative' }}>
-          <div style={{
-            aspectRatio: '3/4', overflow: 'hidden',
-            background: '#f5f5f5',
-          }}>
+          <div
+            className="about-photo-wrap"
+            style={{
+              aspectRatio: '3/4', overflow: 'hidden',
+              background: '#f5f5f5',
+            }}
+          >
             <img
               src={KAY_PHOTO}
               alt="Kay Tubillla — photographer"

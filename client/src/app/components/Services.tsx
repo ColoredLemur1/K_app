@@ -64,12 +64,13 @@ export function Services() {
         </p>
 
         {/* Two cards */}
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(2, 1fr)',
-          gap: 2,
-        }}
-          className="sm:grid-cols-1"
+        <div
+          className="services-grid"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(2, 1fr)',
+            gap: 2,
+          }}
         >
           {SERVICES.map(svc => (
             <div

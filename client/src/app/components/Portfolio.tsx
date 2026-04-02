@@ -139,12 +139,12 @@ export function Portfolio() {
         {/* Grid */}
         <div
           ref={gridRef}
+          className="portfolio-grid"
           style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(3, 1fr)',
             gap: 12,
           }}
-          className="sm:grid-cols-2 grid-cols-1"
         >
           {filtered.map(item => (
             <div
