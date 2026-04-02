@@ -126,10 +126,11 @@ export function Header() {
 
             <div className="hidden md:block" style={{ width: 1, height: 16, background: '#ddd' }} />
 
-            {/* Auth — always visible */}
+            {/* Auth — desktop only (also shown inside overlay on mobile) */}
             {user ? (
               <button
                 onClick={handleLogout}
+                className="hidden md:inline"
                 style={{
                   padding: '8px 18px',
                   background: '#111', color: '#fff',
@@ -143,7 +144,7 @@ export function Header() {
               </button>
             ) : (
               <>
-                <Link to="/login" style={{
+                <Link to="/login" className="hidden md:inline" style={{
                   padding: '7px 16px',
                   border: '1px solid #111', color: '#111',
                   fontFamily: "'Helvetica Neue', Arial, sans-serif",
@@ -153,7 +154,7 @@ export function Header() {
                 }}>
                   Log In
                 </Link>
-                <Link to="/register" style={{
+                <Link to="/register" className="hidden md:inline" style={{
                   padding: '8px 18px',
                   background: '#111', color: '#fff',
                   fontFamily: "'Helvetica Neue', Arial, sans-serif",
@@ -269,6 +270,44 @@ export function Header() {
           >
             Submit for Editing
           </Link>
+        </div>
+
+        {/* Auth links — mobile overlay only */}
+        <div style={{
+          position: 'absolute', bottom: 40,
+          display: 'flex', gap: 16, alignItems: 'center',
+        }}>
+          {user ? (
+            <button
+              onClick={() => { closeMenu(); handleLogout(); }}
+              style={{
+                background: 'none', border: 'none', padding: 0,
+                fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
+                textTransform: 'uppercase', color: '#888', cursor: 'pointer',
+              }}
+            >
+              Log Out
+            </button>
+          ) : (
+            <>
+              <Link to="/login" onClick={closeMenu} style={{
+                fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
+                textTransform: 'uppercase', color: '#888', textDecoration: 'none',
+              }}>
+                Log In
+              </Link>
+              <span style={{ color: '#ddd', fontSize: 11 }}>·</span>
+              <Link to="/register" onClick={closeMenu} style={{
+                fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
+                textTransform: 'uppercase', color: '#888', textDecoration: 'none',
+              }}>
+                Register
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </>
