@@ -1,0 +1,69 @@
+/* ============================================================
+   Mobile overrides — breakpoint 768px
+   Uses !important to override inline styles set in React.
+   ============================================================ */
+
+/* --- Portfolio --- */
+@media (max-width: 768px) {
+  .portfolio-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  #portfolio {
+    padding: 72px 0 !important;
+  }
+  #portfolio > div {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+/* --- Services --- */
+@media (max-width: 768px) {
+  .services-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .service-card {
+    padding: 40px 24px !important;
+  }
+  #services {
+    padding: 72px 0 !important;
+  }
+  #services > div {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+/* --- About --- */
+@media (max-width: 768px) {
+  .about-grid {
+    grid-template-columns: 1fr !important;
+    gap: 40px !important;
+  }
+  /* Text column first, photo column second */
+  .about-grid > div:first-child {
+    order: 2;
+  }
+  .about-grid > div:last-child {
+    order: 1;
+  }
+  .about-photo-wrap {
+    aspect-ratio: 16 / 9 !important;
+  }
+  #about {
+    padding: 72px 0 !important;
+  }
+  #about > div {
+    padding-left: 20px !important;
+    padding-right: 20px !important;
+  }
+}
+
+/* --- Footer --- */
+@media (max-width: 768px) {
+  #contact > div {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    gap: 16px !important;
+  }
+}

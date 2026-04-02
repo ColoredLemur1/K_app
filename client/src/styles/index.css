@@ -3,6 +3,7 @@
 @import './fonts.css';
 @import './tailwind.css';
 @import './theme.css';
+@import './responsive.css';
 
 .portfolio-card:hover .portfolio-tag {
   opacity: 1 !important;
