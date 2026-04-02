@@ -1,5 +1,7 @@
+import { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import gsap from 'gsap';
 
 const NAV_LINKS = [
   { label: 'Portfolio', id: 'portfolio' },
@@ -11,128 +13,264 @@ const NAV_LINKS = [
 export function Header() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [menuOpen, setMenuOpen] = useState(false);
+  const overlayRef = useRef<HTMLDivElement>(null);
 
   const scrollTo = (id: string) =>
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
 
   const handleLogout = () => { logout(); navigate('/'); };
 
+  const closeMenu = () => setMenuOpen(false);
+
+  const handleNavClick = (id: string) => {
+    closeMenu();
+    setTimeout(() => scrollTo(id), 280);
+  };
+
+  // GSAP fade the overlay in/out
+  useEffect(() => {
+    const el = overlayRef.current;
+    if (!el) return;
+    if (menuOpen) {
+      gsap.fromTo(el,
+        { opacity: 0, pointerEvents: 'none' },
+        { opacity: 1, pointerEvents: 'auto', duration: 0.25 }
+      );
+      document.body.style.overflow = 'hidden';
+    } else {
+      gsap.to(el, {
+        opacity: 0, pointerEvents: 'none', duration: 0.25,
+        onComplete: () => { document.body.style.overflow = ''; },
+      });
+    }
+  }, [menuOpen]);
+
   return (
-    <header style={{
-      position: 'fixed', top: 0, left: 0, right: 0,
-      zIndex: 1000,
-      background: 'rgba(255,255,255,0.92)',
-      backdropFilter: 'blur(12px)',
-      borderBottom: '1px solid rgba(0,0,0,0.06)',
-    }}>
-      <div style={{
-        maxWidth: 1200, margin: '0 auto',
-        padding: '0 32px',
-        height: 64,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    <>
+      <header style={{
+        position: 'fixed', top: 0, left: 0, right: 0,
+        zIndex: 1000,
+        background: 'rgba(255,255,255,0.92)',
+        backdropFilter: 'blur(12px)',
+        borderBottom: '1px solid rgba(0,0,0,0.06)',
       }}>
+        <div style={{
+          maxWidth: 1200, margin: '0 auto',
+          padding: '0 32px',
+          height: 64,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        }}>
 
-        {/* Logo */}
-        <Link to="/" style={{ textDecoration: 'none' }}>
-          <span style={{
-            fontFamily: "'Helvetica Neue', Arial, sans-serif",
-            fontSize: 13, fontWeight: 500, letterSpacing: '0.12em',
-            textTransform: 'uppercase', color: '#111',
-          }}>
-            Kay Tubillla
-          </span>
-        </Link>
+          {/* Logo */}
+          <Link to="/" style={{ textDecoration: 'none' }}>
+            <span style={{
+              fontFamily: "'Helvetica Neue', Arial, sans-serif",
+              fontSize: 13, fontWeight: 500, letterSpacing: '0.12em',
+              textTransform: 'uppercase', color: '#111',
+            }}>
+              Kay Tubillla
+            </span>
+          </Link>
 
-        {/* Scroll nav — hidden on small screens */}
-        <nav style={{ display: 'flex', gap: 32 }} className="hidden md:flex">
-          {NAV_LINKS.map(({ label, id }) => (
-            <button
-              key={id}
-              onClick={() => scrollTo(id)}
+          {/* Scroll nav — desktop only */}
+          <nav style={{ display: 'flex', gap: 32 }} className="hidden md:flex">
+            {NAV_LINKS.map(({ label, id }) => (
+              <button
+                key={id}
+                onClick={() => scrollTo(id)}
+                style={{
+                  background: 'none', border: 'none', padding: 0,
+                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                  fontSize: 12, fontWeight: 400, letterSpacing: '0.08em',
+                  textTransform: 'uppercase', color: '#444',
+                  cursor: 'pointer', transition: 'color 0.2s',
+                }}
+                onMouseEnter={e => (e.currentTarget.style.color = '#111')}
+                onMouseLeave={e => (e.currentTarget.style.color = '#444')}
+              >
+                {label}
+              </button>
+            ))}
+            <Link
+              to="/service-area"
               style={{
-                background: 'none', border: 'none', padding: 0,
                 fontFamily: "'Helvetica Neue', Arial, sans-serif",
                 fontSize: 12, fontWeight: 400, letterSpacing: '0.08em',
                 textTransform: 'uppercase', color: '#444',
-                cursor: 'pointer', transition: 'color 0.2s',
+                textDecoration: 'none', transition: 'color 0.2s',
               }}
-              onMouseEnter={e => (e.currentTarget.style.color = '#111')}
-              onMouseLeave={e => (e.currentTarget.style.color = '#444')}
+            >
+              Area
+            </Link>
+          </nav>
+
+          {/* Right side */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+
+            {/* Book + Editing — desktop only */}
+            <Link to="/book" className="hidden md:inline" style={{
+              fontFamily: "'Helvetica Neue', Arial, sans-serif",
+              fontSize: 12, fontWeight: 500, letterSpacing: '0.08em',
+              textTransform: 'uppercase', color: '#111', textDecoration: 'none',
+            }}>
+              Book
+            </Link>
+            <Link to="/editing" className="hidden md:inline" style={{
+              fontFamily: "'Helvetica Neue', Arial, sans-serif",
+              fontSize: 12, fontWeight: 500, letterSpacing: '0.08em',
+              textTransform: 'uppercase', color: '#111', textDecoration: 'none',
+            }}>
+              Editing
+            </Link>
+
+            <div className="hidden md:block" style={{ width: 1, height: 16, background: '#ddd' }} />
+
+            {/* Auth — always visible */}
+            {user ? (
+              <button
+                onClick={handleLogout}
+                style={{
+                  padding: '8px 18px',
+                  background: '#111', color: '#fff',
+                  border: 'none',
+                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                  fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
+                  textTransform: 'uppercase', cursor: 'pointer',
+                }}
+              >
+                Log Out
+              </button>
+            ) : (
+              <>
+                <Link to="/login" style={{
+                  padding: '7px 16px',
+                  border: '1px solid #111', color: '#111',
+                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                  fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
+                  textTransform: 'uppercase', textDecoration: 'none',
+                  transition: 'background 0.2s, color 0.2s',
+                }}>
+                  Log In
+                </Link>
+                <Link to="/register" style={{
+                  padding: '8px 18px',
+                  background: '#111', color: '#fff',
+                  fontFamily: "'Helvetica Neue', Arial, sans-serif",
+                  fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
+                  textTransform: 'uppercase', textDecoration: 'none',
+                }}>
+                  Register
+                </Link>
+              </>
+            )}
+
+            {/* Hamburger — mobile only */}
+            <button
+              onClick={() => setMenuOpen(true)}
+              className="md:hidden"
+              aria-label="Open menu"
+              style={{
+                background: 'none', border: 'none', padding: '4px 0 4px 8px',
+                cursor: 'pointer', display: 'flex', flexDirection: 'column',
+                gap: 5, justifyContent: 'center',
+              }}
+            >
+              <span style={{ display: 'block', width: 20, height: 1.5, background: '#111' }} />
+              <span style={{ display: 'block', width: 20, height: 1.5, background: '#111' }} />
+              <span style={{ display: 'block', width: 20, height: 1.5, background: '#111' }} />
+            </button>
+          </div>
+        </div>
+      </header>
+
+      {/* Full-screen mobile overlay — sibling of <header>, NOT a child */}
+      <div
+        ref={overlayRef}
+        style={{
+          position: 'fixed', inset: 0, zIndex: 2000,
+          background: '#fff',
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', justifyContent: 'center',
+          opacity: 0, pointerEvents: 'none',
+          fontFamily: "'Helvetica Neue', Arial, sans-serif",
+        }}
+      >
+        {/* Close button */}
+        <button
+          onClick={closeMenu}
+          aria-label="Close menu"
+          style={{
+            position: 'absolute', top: 20, right: 24,
+            background: 'none', border: 'none',
+            fontSize: 32, color: '#111', cursor: 'pointer',
+            lineHeight: 1, padding: 4,
+          }}
+        >
+          ×
+        </button>
+
+        {/* Nav links */}
+        <nav style={{
+          display: 'flex', flexDirection: 'column',
+          alignItems: 'center', gap: 24, marginBottom: 48,
+        }}>
+          {NAV_LINKS.map(({ label, id }) => (
+            <button
+              key={id}
+              onClick={() => handleNavClick(id)}
+              style={{
+                background: 'none', border: 'none', padding: 0,
+                fontSize: 'clamp(28px, 8vw, 40px)', fontWeight: 300,
+                letterSpacing: '-0.01em', color: '#111',
+                cursor: 'pointer',
+                fontFamily: "'Helvetica Neue', Arial, sans-serif",
+              }}
             >
               {label}
             </button>
           ))}
           <Link
             to="/service-area"
+            onClick={closeMenu}
             style={{
+              fontSize: 'clamp(28px, 8vw, 40px)', fontWeight: 300,
+              letterSpacing: '-0.01em', color: '#111',
+              textDecoration: 'none',
               fontFamily: "'Helvetica Neue', Arial, sans-serif",
-              fontSize: 12, fontWeight: 400, letterSpacing: '0.08em',
-              textTransform: 'uppercase', color: '#444',
-              textDecoration: 'none', transition: 'color 0.2s',
             }}
           >
             Area
           </Link>
         </nav>
 
-        {/* Right CTAs */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <Link to="/book" style={{
-            fontFamily: "'Helvetica Neue', Arial, sans-serif",
-            fontSize: 12, fontWeight: 500, letterSpacing: '0.08em',
-            textTransform: 'uppercase', color: '#111', textDecoration: 'none',
-          }}>
-            Book
+        {/* CTA buttons */}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 12, alignItems: 'center' }}>
+          <Link
+            to="/book"
+            onClick={closeMenu}
+            style={{
+              padding: '14px 40px', background: '#111', color: '#fff',
+              fontSize: 11, fontWeight: 600, letterSpacing: '0.15em',
+              textTransform: 'uppercase', textDecoration: 'none',
+            }}
+          >
+            Book a Session
           </Link>
-          <Link to="/editing" style={{
-            fontFamily: "'Helvetica Neue', Arial, sans-serif",
-            fontSize: 12, fontWeight: 500, letterSpacing: '0.08em',
-            textTransform: 'uppercase', color: '#111', textDecoration: 'none',
-          }}>
-            Editing
+          <Link
+            to="/editing"
+            onClick={closeMenu}
+            style={{
+              padding: '13px 40px',
+              border: '1px solid #111', color: '#111',
+              fontSize: 11, fontWeight: 600, letterSpacing: '0.15em',
+              textTransform: 'uppercase', textDecoration: 'none',
+            }}
+          >
+            Submit for Editing
           </Link>
-
-          <div style={{ width: 1, height: 16, background: '#ddd' }} />
-
-          {user ? (
-            <button
-              onClick={handleLogout}
-              style={{
-                padding: '8px 18px',
-                background: '#111', color: '#fff',
-                border: 'none',
-                fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
-                textTransform: 'uppercase', cursor: 'pointer',
-              }}
-            >
-              Log Out
-            </button>
-          ) : (
-            <>
-              <Link to="/login" style={{
-                padding: '7px 16px',
-                border: '1px solid #111', color: '#111',
-                fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
-                textTransform: 'uppercase', textDecoration: 'none',
-                transition: 'background 0.2s, color 0.2s',
-              }}>
-                Log In
-              </Link>
-              <Link to="/register" style={{
-                padding: '8px 18px',
-                background: '#111', color: '#fff',
-                fontFamily: "'Helvetica Neue', Arial, sans-serif",
-                fontSize: 11, fontWeight: 500, letterSpacing: '0.1em',
-                textTransform: 'uppercase', textDecoration: 'none',
-              }}>
-                Register
-              </Link>
-            </>
-          )}
         </div>
       </div>
-    </header>
+    </>
   );
 }
